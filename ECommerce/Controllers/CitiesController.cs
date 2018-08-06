@@ -7,6 +7,7 @@ using System.Net;
 using System.Web;
 using System.Web.Mvc;
 using ECommerce.Models;
+using ECommerce.Clases;
 
 namespace ECommerce.Controllers
 {
@@ -39,17 +40,8 @@ namespace ECommerce.Controllers
         // GET: Cities/Create
         public ActionResult Create()
         {
-            var departments = db.Departments.ToList();
-            departments.Add(new Department
-            {
-                DepartmentId = 0,
-                Name ="[Select a department...]",
-            }
-                );
 
-            departments = departments.OrderBy(d => d.Name).ToList();
-
-            ViewBag.DepartmentId = new SelectList(departments,
+            ViewBag.DepartmentId = new SelectList(CombosHelper.GetDepartments(),
                 "DepartmentId",
                 "Name");
             return View();
@@ -69,8 +61,7 @@ namespace ECommerce.Controllers
                 return RedirectToAction("Index");
             }
 
-            ViewBag.DepartmentId = new SelectList(
-                db.Departments.OrderBy(d=>d.Name), 
+            ViewBag.DepartmentId = new SelectList(CombosHelper.GetDepartments(),
                 "DepartmentId",
                 "Name",
                 city.DepartmentId);
@@ -89,7 +80,7 @@ namespace ECommerce.Controllers
             {
                 return HttpNotFound();
             }
-            ViewBag.DepartmentId = new SelectList(db.Departments.OrderBy(d => d.Name),
+            ViewBag.DepartmentId = new SelectList(CombosHelper.GetDepartments(),
                 "DepartmentId",
                 "Name", city.DepartmentId);
             return View(city);
@@ -108,7 +99,7 @@ namespace ECommerce.Controllers
                 db.SaveChanges();
                 return RedirectToAction("Index");
             }
-            ViewBag.DepartmentId = new SelectList(db.Departments.OrderBy(d => d.Name),
+            ViewBag.DepartmentId = new SelectList(CombosHelper.GetDepartments(),
                 "DepartmentId",
                 "Name", city.DepartmentId);
             return View(city);

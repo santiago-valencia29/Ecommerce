@@ -18,9 +18,11 @@ namespace ECommerce.Models
 
 
         [Required(ErrorMessage = "The field {0} is required")]
-        [Range(1,double.MaxValue,ErrorMessage = "You must select a {0}")]
+        [Range(1,double.MaxValue,ErrorMessage = "You must select a {0}")] //Validador para seleccionar en el Dropdownlist
         public int DepartmentId { get; set; }
 
         public virtual Department Department { get; set; }
+
+        public virtual ICollection<Company> Companies { get; set; }
     }
 }
