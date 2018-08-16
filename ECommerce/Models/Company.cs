@@ -41,6 +41,9 @@ namespace ECommerce.Models
             [Required(ErrorMessage = "The field {0} is required")]
             [Range(1, double.MaxValue, ErrorMessage = "You must select a {0}")] //Validador para seleccionar en el Dropdownlist
             public int CityId { get; set; }
+    
+            [NotMapped] //no se agrega a la bd
+            public HttpPostedFileBase LogoFile { get; set; }
 
 
             public virtual Department Department { get; set; }

@@ -7,6 +7,7 @@ using System.Net;
 using System.Web;
 using System.Web.Mvc;
 using ECommerce.Models;
+using ECommerce.Clases;
 
 namespace ECommerce.Controllers
 {
@@ -39,8 +40,8 @@ namespace ECommerce.Controllers
         // GET: Companies/Create
         public ActionResult Create()
         {
-            ViewBag.CityId = new SelectList(db.Cities, "CityId", "Name");
-            ViewBag.DepartmentId = new SelectList(db.Departments, "DepartmentId", "Name");
+            ViewBag.CityId = new SelectList(CombosHelper.GetCities(), "CityId", "Name");
+            ViewBag.DepartmentId = new SelectList(CombosHelper.GetDepartments(), "DepartmentId", "Name");
             return View();
         }
 
@@ -49,17 +50,28 @@ namespace ECommerce.Controllers
         // more details see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public ActionResult Create([Bind(Include = "CompanyId,Name,Phone,Address,Logo,DepartmentId,CityId")] Company company)
+        public ActionResult Create( Company company)
         {
             if (ModelState.IsValid)
             {
+                var pic = string.Empty;
+                var folder = "~/Content/Logos";
+
+                if (company.LogoFile != null)
+                {
+                    pic = FilesHelper.UploadPhoto(company.LogoFile, folder);
+                    pic = string.Format("{0}/{1}", folder, pic);
+                }
+
+                company.Logo = pic;
+
                 db.Companies.Add(company);
-                db.SaveChanges();
+                db.SaveChanges();// RECORDAR PONERLES TRY CATH A LOS SAVECHANGES
                 return RedirectToAction("Index");
             }
 
-            ViewBag.CityId = new SelectList(db.Cities, "CityId", "Name", company.CityId);
-            ViewBag.DepartmentId = new SelectList(db.Departments, "DepartmentId", "Name", company.DepartmentId);
+            ViewBag.CityId = new SelectList(CombosHelper.GetCities(), "CityId", "Name", company.CityId);
+            ViewBag.DepartmentId = new SelectList(CombosHelper.GetDepartments() ,"DepartmentId", "Name", company.DepartmentId);
             return View(company);
         }
 
@@ -75,8 +87,8 @@ namespace ECommerce.Controllers
             {
                 return HttpNotFound();
             }
-            ViewBag.CityId = new SelectList(db.Cities, "CityId", "Name", company.CityId);
-            ViewBag.DepartmentId = new SelectList(db.Departments, "DepartmentId", "Name", company.DepartmentId);
+            ViewBag.CityId = new SelectList(CombosHelper.GetCities(), "CityId", "Name", company.CityId);
+            ViewBag.DepartmentId = new SelectList(CombosHelper.GetDepartments(), "DepartmentId", "Name", company.DepartmentId);
             return View(company);
         }
 
@@ -93,8 +105,8 @@ namespace ECommerce.Controllers
                 db.SaveChanges();
                 return RedirectToAction("Index");
             }
-            ViewBag.CityId = new SelectList(db.Cities, "CityId", "Name", company.CityId);
-            ViewBag.DepartmentId = new SelectList(db.Departments, "DepartmentId", "Name", company.DepartmentId);
+            ViewBag.CityId = new SelectList(CombosHelper.GetCities(), "CityId", "Name", company.CityId);
+            ViewBag.DepartmentId = new SelectList(CombosHelper.GetDepartments(), "DepartmentId", "Name", company.DepartmentId);
             return View(company);
         }
 
@@ -123,6 +135,14 @@ namespace ECommerce.Controllers
             db.SaveChanges();
             return RedirectToAction("Index");
         }
+
+        public JsonResult GetCities(int departmentId) //metodo para el dropdownlist en cascada
+        {
+            db.Configuration.ProxyCreationEnabled = false;
+            var cities = db.Cities.Where(m => m.DepartmentId == departmentId);
+            return Json(cities);
+        }
+
 
         protected override void Dispose(bool disposing)
         {

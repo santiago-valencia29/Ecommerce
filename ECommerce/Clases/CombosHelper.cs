@@ -29,5 +29,22 @@ namespace ECommerce.Clases
         {
             db.Dispose();
         }
+
+
+        public static List<City> GetCities()
+
+        {
+            var cities = db.Cities.ToList();
+            cities.Add(new City
+            {
+                CityId = 0,
+                Name = "[Select a City...]",
+            }
+                );
+
+            return cities.OrderBy(d => d.Name).ToList();
+
+        }
+
     }
 }
